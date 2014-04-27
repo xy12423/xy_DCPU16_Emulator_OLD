@@ -1,0 +1,182 @@
+#pragma once
+
+#ifndef _H_EXP
+#define _H_EXP
+
+#include "defines.h"
+#include "floppy.h"
+
+hardware info;
+ULONGLONG thrArg;
+
+int __cdecl intrpt()
+{
+	/*
+	USHORT a = 0;
+	(*getReg)(REG_A, &a);
+	switch (a)
+	{
+		case FLOPPY_MESSAGE_STATE:
+		{
+			(*setReg)(REG_B, floppyState);
+			(*setReg)(REG_C, floppyError);
+			floppyError = FLOPPY_ERROR_NONE;
+			break;
+		}
+		case FLOPPY_MESSAGE_SETINTURRUPT:
+		{
+			(*getReg)(REG_X, const_cast<USHORT*>(&inturruptMessage));
+			break;
+		}
+		case FLOPPY_MESSAGE_READ:
+		{
+			USHORT state = floppyState;
+			switch (state)
+			{
+				case FLOPPY_STATE_READY:
+				case FLOPPY_STATE_READY_WP:
+				{
+					floppyState = FLOPPY_STATE_BUSY;
+					workType = 1;
+					(*getReg)(REG_X,
+						const_cast<USHORT*>(&workSector));
+					(*getReg)(REG_Y,
+						const_cast<USHORT*>(&workAddress));
+					(*setReg)(REG_B, FLOPPY_ERROR_NONE);
+					hasWork = true;
+					break;
+				}
+				case FLOPPY_STATE_NO_MEDIA:
+				{
+					(*setReg)(REG_B, FLOPPY_ERROR_NO_MEDIA);
+					break;
+				}
+				case FLOPPY_STATE_BUSY:
+				{
+					(*setReg)(REG_B, FLOPPY_ERROR_BUSY);
+					break;
+				}
+			}
+			break;
+		}
+		case FLOPPY_MESSAGE_WRITE:
+		{
+			USHORT state = floppyState;
+			switch (state)
+			{
+				case FLOPPY_STATE_READY:
+				{
+					floppyState = FLOPPY_STATE_BUSY;
+					workType = 1;
+					(*getReg)(REG_X,
+						const_cast<USHORT*>(&workSector));
+					(*getReg)(REG_Y,
+						const_cast<USHORT*>(&workAddress));
+					(*setReg)(REG_B, FLOPPY_ERROR_NONE);
+					hasWork = true;
+					break;
+				}
+				case FLOPPY_STATE_NO_MEDIA:
+				{
+					(*setReg)(REG_B, FLOPPY_ERROR_NO_MEDIA);
+					break;
+				}
+				case FLOPPY_STATE_READY_WP:
+				{
+					(*setReg)(REG_B, FLOPPY_ERROR_PROTECTED);
+					break;
+				}
+				case FLOPPY_STATE_BUSY:
+				{
+					(*setReg)(REG_B, FLOPPY_ERROR_BUSY);
+					break;
+				}
+			}
+			break;
+		}
+	}
+	*/
+	USHORT itr = 0;
+	int cycle = 0;
+	getReg(0, &itr);
+	switch (itr)
+	{
+		case 0:
+			setReg(1, floppyState);
+			setReg(2, floppyError);
+			break;
+		case 1:
+			getReg(REG_X, const_cast<USHORT *>(&throwItrpt));
+			break;
+		case 2:
+			switch (floppyState)
+			{
+				case FLOPPY_STATE_NO_MEDIA:
+					setError(FLOPPY_ERROR_NO_MEDIA);
+					setReg(REG_B, 0);
+					break;
+				case FLOPPY_STATE_READY:
+				case FLOPPY_STATE_READY_WP:
+					(getReg)(REG_X, &itr);
+					thrArg = (thrArg << 16) + itr;
+					(getReg)(REG_Y, &itr);
+					thrArg = (thrArg << 16) + itr;
+					threadH = CreateThread(NULL, 0, &FloppyThreadRead, (LPVOID)(&thrArg), 0, &threadID);
+					setReg(REG_B, 1);
+					break;
+				case FLOPPY_STATE_BUSY:
+					setError(FLOPPY_ERROR_BUSY);
+					setReg(REG_B, 0);
+					break;
+			}
+		case 3:
+			switch (floppyState)
+			{
+				case FLOPPY_STATE_NO_MEDIA:
+					setError(FLOPPY_ERROR_NO_MEDIA);
+					setReg(REG_B, 0);
+					break;
+				case FLOPPY_STATE_READY:
+					(getReg)(REG_X, &itr);
+					thrArg = itr;
+					(getReg)(REG_Y, &itr);
+					thrArg = (thrArg << 16) + itr;
+					setState(FLOPPY_STATE_BUSY);
+					threadH = CreateThread(NULL, 0, &FloppyThreadWrite, (LPVOID)(&thrArg), 0, &threadID);
+					setReg(REG_B, 1);
+					break;
+				case FLOPPY_STATE_READY_WP:
+					setError(FLOPPY_ERROR_PROTECTED);
+					setReg(REG_B, 0);
+					break;
+				case FLOPPY_STATE_BUSY:
+					setError(FLOPPY_ERROR_BUSY);
+					setReg(REG_B, 0);
+					break;
+			}
+	}
+	return 0;
+}
+
+extern "C" __declspec(dllexport) int init()
+{
+	if (LoadDisk("FLD.dfd") != 0)
+		return -1;
+	return 0;
+}
+
+extern "C" __declspec(dllexport) hardware __cdecl getInfo()
+{
+	return info;
+}
+
+extern "C" __declspec(dllexport) void __cdecl setHandle(void *p1, void *p2, void *p3, void *p4, void *p5)
+{
+	setMem = (fSet)(p1);
+	getMem = (fGet)(p2);
+	setReg = (fSet)(p3);
+	getReg = (fGet)(p4);
+	additr = (fAdditr)(p5);
+}
+
+#endif

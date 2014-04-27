@@ -1,0 +1,3 @@
+Clock.dll
+Floppy.dll
+Monitor.dll
