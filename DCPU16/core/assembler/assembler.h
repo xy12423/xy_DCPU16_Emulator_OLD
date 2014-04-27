@@ -39,6 +39,8 @@ int assembler(std::string code, USHORT ret[], int retLen)
 			a = code.substr(dotPos + 1);
 		}
 	}
+	b = trim(b);
+	a = trim(a);
 	preprcs(op, b, a);
 	if (b.length() == 0)
 	{

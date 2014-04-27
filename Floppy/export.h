@@ -44,6 +44,7 @@ int __cdecl intrpt()
 					setReg(REG_B, 0);
 					break;
 			}
+			break;
 		case 3:
 			switch (floppyState)
 			{
@@ -56,7 +57,6 @@ int __cdecl intrpt()
 					thrArg = itr;
 					(getReg)(REG_Y, &itr);
 					thrArg = (thrArg << 16) + itr;
-					setState(FLOPPY_STATE_BUSY);
 					threadH = CreateThread(NULL, 0, &FloppyThreadWrite, (LPVOID)(&thrArg), 0, &threadID);
 					setReg(REG_B, 1);
 					break;
@@ -69,6 +69,7 @@ int __cdecl intrpt()
 					setReg(REG_B, 0);
 					break;
 			}
+			break;
 	}
 	return 0;
 }

@@ -198,6 +198,7 @@ void regist(string arg = "")
 				return;
 			//cout << endl;
 		}
+		cin.get();
 	}
 }
 
