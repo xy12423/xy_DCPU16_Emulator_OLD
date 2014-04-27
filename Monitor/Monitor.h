@@ -46,6 +46,8 @@ mpDef[16] = {
 volatile USHORT mvStart = 0, mfStart = 0, mpStart = 0;
 volatile bool usrMF = false, usrMP = false;
 volatile int mOn = 0;
+volatile int blinkCount = 0;
+volatile bool blinkClock = false;
 
 #ifdef _DEBUG
 bool refed[128][96];
@@ -63,6 +65,9 @@ void CALLBACK ClockMain(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw
 		while (clock() - start < CLOCKS_PER_SEC);
 		return;
 	}
+	blinkCount++;
+	if (blinkCount >= 1000)
+		blinkClock = !blinkClock;
 	if (usrMF)
 	{
 		for (i = 0; i < 256; i++)
@@ -98,16 +103,24 @@ void CALLBACK ClockMain(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw
 	USHORT cel = 0;
 	color fore, back;
 	BYTE chr;
+	bool blink;
 	UINT font;
 	int l, n;
 	i = 0;
-	for (x = 0; x < 128;x += 4)
+	for (y = 0; y < 96; y += 8)
 	{
-		for (y = 0; y < 96; y += 8)
+		for (x = 0; x < 128; x += 4)
 		{
 			(*getMem)((USHORT)(i + mvStart), &cel);
 			fore = mp[(cel & 0xF000) >> 12];
 			back = mp[(cel & 0x0F00) >> 8];
+			blink = cel & 0x0080;
+			if (blink && blinkClock)
+			{
+				back.r = 1.0f - back.r;
+				back.g = 1.0f - back.g;
+				back.b = 1.0f - back.b;
+			}
 			chr = cel & 0x007F;
 			font = (mf[chr * 2] << 16) + mf[chr * 2 + 1];
 			for (l = x + 3; l >= x; l--)
