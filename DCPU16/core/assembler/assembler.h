@@ -9,6 +9,8 @@
 #include "preprocess.h"
 #include "switch.h"
 
+int errD = 0;
+
 int assembler(std::string code, USHORT ret[], int retLen)
 {
 	code = lcase(trim(code));

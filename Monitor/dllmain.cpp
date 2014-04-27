@@ -28,8 +28,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 				mem[i][j].g = 0.0f;
 				mem[i][j].b = 0.0f;
 			}
-		for (int i = 2; i < 256; i++)
-			mfDef[i] = 0xFFFF;
 		mainThread = CreateThread(NULL, 0, &MainThread, NULL, 0, &threadID);
 		break;
 	case DLL_THREAD_ATTACH:

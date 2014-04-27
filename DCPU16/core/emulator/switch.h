@@ -87,7 +87,15 @@ int retb(USHORT b, USHORT &ret)
 	else if (0x8 <= b && b <= 0xF)
 		ret = mem[reg[b - 0x8]];
 	else if (0x10 <= b && b <= 0x17)
+	{
 		ret = mem[reg[b - 0x10] + mem[pc++]];
+		if (pc > 0xFFFF)
+		{
+			pcOf = true;
+			pc &= 0xFFFF;
+		}
+		return 1;
+	}
 	else
 	{
 		switch (b)
@@ -100,6 +108,12 @@ int retb(USHORT b, USHORT &ret)
 				break;
 			case 0x1A:
 				ret = mem[sp + mem[pc++]];
+				if (pc > 0xFFFF)
+				{
+					pcOf = true;
+					pc &= 0xFFFF;
+				}
+				return 1;
 				break;
 			case 0x1B:
 				ret = sp;
@@ -112,23 +126,30 @@ int retb(USHORT b, USHORT &ret)
 				break;
 			case 0x1E:
 				ret = mem[mem[pc++]];
+				if (pc > 0xFFFF)
+				{
+					pcOf = true;
+					pc &= 0xFFFF;
+				}
+				return 1;
 				break;
 			case 0x1F:
 				ret = mem[pc++];
+				if (pc > 0xFFFF)
+				{
+					pcOf = true;
+					pc &= 0xFFFF;
+				}
+				return 1;
 				break;
 			default:
 				return -1;
 		}
 	}
-	if (pc > 0xFFFF)
-	{
-		pcOf = true;
-		pc &= 0xFFFF;
-	}
 	return 0;
 }
 
-int setb(USHORT b, USHORT dat)
+int setb(USHORT b, USHORT dat, int shift)
 {
 	if (b > 0x1F)
 		return -1;
@@ -137,7 +158,7 @@ int setb(USHORT b, USHORT dat)
 	else if (0x8 <= b && b <= 0xF)
 		mem[reg[b - 0x8]] = dat;
 	else if (0x10 <= b && b <= 0x17)
-		mem[reg[b - 0x10] + mem[pc]] = dat;
+		mem[reg[b - 0x10] + mem[pc - shift]] = dat;
 	else
 	{
 		switch (b)
@@ -149,7 +170,7 @@ int setb(USHORT b, USHORT dat)
 				mem[sp] = dat;
 				break;
 			case 0x1A:
-				mem[sp + mem[pc]] = dat;
+				mem[sp + mem[pc - shift]] = dat;
 				break;
 			case 0x1B:
 				sp = dat;
@@ -161,10 +182,7 @@ int setb(USHORT b, USHORT dat)
 				ex = dat;
 				break;
 			case 0x1E:
-				mem[mem[pc]] = dat;
-				break;
-			case 0x1F:
-				mem[pc] = dat;
+				mem[mem[pc - shift]] = dat;
 				break;
 			default:
 				return -1;

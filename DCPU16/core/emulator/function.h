@@ -19,17 +19,6 @@ USHORT OP2US(opcode code)
 	return ((code.a << 10) | (code.b << 5)) | code.op;
 }
 
-int OP2N(opcode origin, opcode &ret)
-{
-	ret.op = origin.op;
-	if (retb(origin.b, ret.b) == -1)
-		return -1;
-	int cycle = reta(origin.a, ret.a);
-	if (cycle == -1)
-		return -1;
-	return cycle;
-}
-
 bool _skip_incpc[0x40] = {
 	false, false, false, false, false, false, false, false,
 	false, false, false, false, false, false, false, false,

@@ -13,7 +13,7 @@ int retOpNum2(std::string op, USHORT &ret)
 			if (op[1] == 'a' && op[2] == 't')
 				ret = 0x20;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_OP;
 			break;
 		case 'h':
 			if (op[1] == 'w')
@@ -25,11 +25,11 @@ int retOpNum2(std::string op, USHORT &ret)
 				else if (op[2] == 'q')
 					ret = 0x11;
 				else
-					return _ERR_ASM_ILLEGAL;
+					return _ERR_ASM_ILLEGAL_OP;
 				break;
 			}
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_OP;
 			break;
 		case 'i':
 			if (op[1] == 'a')
@@ -41,27 +41,27 @@ int retOpNum2(std::string op, USHORT &ret)
 				else if (op[2] == 's')
 					ret = 0x0A;
 				else
-					return _ERR_ASM_ILLEGAL;
+					return _ERR_ASM_ILLEGAL_OP;
 			}
 			else if (op[1] == 'n' && op[2] == 't')
 				ret = 0x08;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_OP;
 			break;
 		case 'j':
 			if (op[1] == 's' && op[2] == 'r')
 				ret = 0x01;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_OP;
 			break;
 		case 'r':
 			if (op[1] == 'f' && op[2] == 'i')
 				ret = 0x0B;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_OP;
 			break;
 		default:
-			return _ERR_ASM_ILLEGAL;
+			return _ERR_ASM_ILLEGAL_OP;
 	}
 	return _ERR_ASM_NOERR;
 }
@@ -79,29 +79,29 @@ int retOpNum3(std::string op, USHORT &ret)
 					else if (op[2] == 'x')
 						ret = 0x1A;
 					else
-						return _ERR_ASM_ILLEGAL;
+						return _ERR_ASM_ILLEGAL_OP;
 					break;
 				case 'n':
 					if (op[2] == 'd')
 						ret = 0x0A;
 					else
-						return _ERR_ASM_ILLEGAL;
+						return _ERR_ASM_ILLEGAL_OP;
 					break;
 				case 's':
 					if (op[2] == 'r')
 						ret = 0x0E;
 					else
-						return _ERR_ASM_ILLEGAL;
+						return _ERR_ASM_ILLEGAL_OP;
 					break;
 				default:
-					return _ERR_ASM_ILLEGAL;
+					return _ERR_ASM_ILLEGAL_OP;
 			}
 			break;
 		case 'b':
 			if (op[1] == 'o' && op[2] == 'r')
 				ret = 0x0B;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_OP;
 			break;
 		case 'd':
 			if (op[1] == 'i' && op[2] == 'v')
@@ -109,7 +109,7 @@ int retOpNum3(std::string op, USHORT &ret)
 			else if (op[1] == 'v' && op[2] == 'i')
 				ret = 0x07;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_OP;
 			break;
 		case 'i':
 			if (op[1] == 'f')
@@ -141,11 +141,11 @@ int retOpNum3(std::string op, USHORT &ret)
 						ret = 0x17;
 						break;
 					default:
-						return _ERR_ASM_ILLEGAL;
+						return _ERR_ASM_ILLEGAL_OP;
 				}
 			}
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_OP;
 			break;
 		case 'm':
 			if (op[1] == 'd' && op[2] == 'i')
@@ -157,7 +157,7 @@ int retOpNum3(std::string op, USHORT &ret)
 			else if (op[1] == 'u' && op[2] == 'l')
 				ret = 0x04;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_OP;
 			break;
 		case 's':
 			switch (op[1])
@@ -166,13 +166,13 @@ int retOpNum3(std::string op, USHORT &ret)
 					if (op[2] == 'x')
 						ret = 0x1B;
 					else
-						return _ERR_ASM_ILLEGAL;
+						return _ERR_ASM_ILLEGAL_OP;
 					break;
 				case 'e':
 					if (op[2] == 't')
 						ret = 0x01;
 					else
-						return _ERR_ASM_ILLEGAL;
+						return _ERR_ASM_ILLEGAL_OP;
 					break;
 				case 'h':
 					if (op[2] == 'l')
@@ -180,7 +180,7 @@ int retOpNum3(std::string op, USHORT &ret)
 					else if (op[2] == 'r')
 						ret = 0x0D;
 					else
-						return _ERR_ASM_ILLEGAL;
+						return _ERR_ASM_ILLEGAL_OP;
 					break;
 				case 't':
 					if (op[2] == 'd')
@@ -188,33 +188,33 @@ int retOpNum3(std::string op, USHORT &ret)
 					else if (op[2] == 'i')
 						ret = 0x1E;
 					else
-						return _ERR_ASM_ILLEGAL;
+						return _ERR_ASM_ILLEGAL_OP;
 					break;
 				case 'u':
 					if (op[2] == 'b')
 						ret = 0x03;
 					else
-						return _ERR_ASM_ILLEGAL;
+						return _ERR_ASM_ILLEGAL_OP;
 					break;
 				default:
-					return _ERR_ASM_ILLEGAL;
+					return _ERR_ASM_ILLEGAL_OP;
 			}
 			break;
 		case 'x':
 			if (op[1] == 'o' && op[2] == 'r')
 				ret = 0x0C;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_OP;
 			break;
 		default:
-			return _ERR_ASM_ILLEGAL;
+			return _ERR_ASM_ILLEGAL_OP;
 	}
 	return _ERR_ASM_NOERR;
 }
 
 int retOpStr1(USHORT op, std::string &ret)
 {
-	return _ERR_ASM_ILLEGAL;
+	return _ERR_ASM_ILLEGAL_OP;
 }
 
 std::string op2[] = {
@@ -338,7 +338,7 @@ int retGRegNum(std::string reg, USHORT &ret)
 			ret = 0x07;
 			break;
 		default:
-			return _ERR_ASM_ILLEGAL;
+			return _ERR_ASM_ILLEGAL_ARG;
 	}
 	return _ERR_ASM_NOERR;
 }

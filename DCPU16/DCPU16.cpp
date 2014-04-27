@@ -80,6 +80,8 @@ void assm(string arg)
 				cout << "Instruction is not supported" << endl;
 				break;
 			case _ERR_ASM_ILLEGAL:
+			case _ERR_ASM_ILLEGAL_OP:
+			case _ERR_ASM_ILLEGAL_ARG:
 				cout << "Illegal instruction" << endl;
 				break;
 			default:
@@ -233,19 +235,18 @@ void proceed()
 #endif
 }
 
-
 struct label
 {
-	string str;
+	std::string str;
 	USHORT pos;
 	label();
-	label(string _str, USHORT _pos)
+	label(std::string _str, USHORT _pos)
 	{
 		str = _str;
 		pos = _pos;
 	}
 };
-typedef list<label> stringList;
+typedef std::list<label> stringList;
 
 void generate(string path)
 {
@@ -254,7 +255,9 @@ void generate(string path)
 	char line[100];
 	int lineCount = 0;
 	string insline;
-	stringList lbllst;
+	stringList lblLst;
+	stringList pendLst;
+	int pendCount = 0;
 	stringList::const_iterator lblitr, lblend;
 	while (!file.eof())
 	{
@@ -267,11 +270,13 @@ void generate(string path)
 		if (markPos != string::npos)
 		{
 			string lbl = insline.substr(0, markPos);
-			lbllst.push_back(label(lbl, add));
+			lblLst.push_back(label(lbl, add));
 			insline.erase(0, markPos + 1);
 		}
-		lblitr = lbllst.cbegin();
-		lblend = lbllst.cend();
+		if (insline.length() < 1)
+			continue;
+		lblitr = lblLst.cbegin();
+		lblend = lblLst.cend();
 		for (; lblitr != lblend; lblitr++)
 		{
 			markPos = insline.find((*lblitr).str);
@@ -285,13 +290,21 @@ void generate(string path)
 				cout << "Instruction in line " << lineCount << " is not supported" << endl;
 				goto _g_end;
 			case _ERR_ASM_ILLEGAL:
+			case _ERR_ASM_ILLEGAL_OP:
 				cout << "Illegal instruction in line " << lineCount << endl;
 				goto _g_end;
+			case _ERR_ASM_ILLEGAL_ARG:
+				pendLst.push_back(label(insline, add));
+				pendCount++;
+				add += 3;
+				break;
 			default:
 				for (int i = 0; i < len; i++, add++)
 					mem[add] = m_ret[i];
 		}
 	}
+	if (pendCount != 0)
+		cout << "" << endl;
 	_g_end:file.close();
 }
 
