@@ -75,9 +75,8 @@ int __cdecl intrpt()
 
 extern "C" __declspec(dllexport) int init()
 {
-	if (LoadDisk("FLD.dfd") != 0)
-		return -1;
-	return 0;
+	int ret = LoadDisk("floppy.dfd");
+	return ret;
 }
 
 extern "C" __declspec(dllexport) hardware __cdecl getInfo()

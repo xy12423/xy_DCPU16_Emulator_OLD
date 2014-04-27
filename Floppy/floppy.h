@@ -41,7 +41,7 @@ int LoadDisk(string _path)
 	floppyState = FLOPPY_STATE_NO_MEDIA;
 	int ret = 0;
 	fstream floppyFile(_path, ios::in | ios::binary);
-	if (!(!floppyFile))
+	if (!floppyFile.is_open())
 	{
 		ret = -1;
 		return -1;
