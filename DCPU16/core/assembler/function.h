@@ -5,7 +5,6 @@
 
 #include "define.h"
 #include <limits.h>
-#include <sstream>
 
 std::string ltrim(std::string str)
 {

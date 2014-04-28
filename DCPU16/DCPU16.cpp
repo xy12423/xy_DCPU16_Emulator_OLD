@@ -287,9 +287,18 @@ void generate(string path)
 		markPos = insline.find(':');
 		if (markPos != string::npos)
 		{
-			lbl = insline.substr(0, markPos);
-			insline.erase(0, markPos + 1);
-			lblLst.push_back(label(lbl, add));
+			if (markPos == 0)
+			{
+				lbl = insline.substr(1);
+				insline = "";
+				lblLst.push_back(label(lbl, add));
+			}
+			else
+			{
+				lbl = insline.substr(0, markPos);
+				insline.erase(0, markPos + 1);
+				lblLst.push_back(label(lbl, add));
+			}
 		}
 		if (insline.length() < 1)
 			continue;

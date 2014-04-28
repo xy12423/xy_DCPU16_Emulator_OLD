@@ -379,16 +379,36 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 				return _ERR_ASM_ILLEGAL;
 			std::string reg = arg.substr(0, plusPos);
 			std::string shift = arg.substr(plusPos + 1);
+			bool again = true;
+		_ran_begin:
 			if (reg == "sp")
 				ret1 = 0x1A;
 			else
 			{
 				if (retGRegNum(reg, ret1) == _ERR_ASM_ILLEGAL)
-					return _ERR_ASM_ILLEGAL;
+				{
+					if (again)
+					{
+						swap(reg, shift);
+						again = false;
+						goto _ran_begin;
+					}
+					else
+						return _ERR_ASM_ILLEGAL;
+				}
 				ret1 += 0x10;
 			}
 			if (!canBeNum(shift))
-				return _ERR_ASM_ILLEGAL_ARG;
+			{
+				if (again)
+				{
+					swap(reg, shift);
+					again = false;
+					goto _ran_begin;
+				}
+				else
+					return _ERR_ASM_ILLEGAL_ARG;
+			}
 			ret2 = (USHORT)toNum(shift);
 			inslen = 2;
 		}
