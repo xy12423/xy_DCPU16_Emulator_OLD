@@ -388,7 +388,7 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 				ret1 += 0x10;
 			}
 			if (!canBeNum(shift))
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_ARG;
 			ret2 = (USHORT)toNum(shift);
 			inslen = 2;
 		}
@@ -405,7 +405,7 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 			else
 			{
 				if (retGRegNum(arg, ret1) == _ERR_ASM_ILLEGAL)
-					return _ERR_ASM_ILLEGAL;
+					return _ERR_ASM_ILLEGAL_ARG;
 				ret1 += 0x08;
 			}
 		}
@@ -428,7 +428,7 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 		if (arglen == 1)
 		{
 			if (retGRegNum(arg, ret1) == _ERR_ASM_ILLEGAL)
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_ARG;
 		}
 		else if (arglen == 2)
 		{
@@ -439,14 +439,14 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 			else if (arg == "ex")
 				ret1 = 0x1D;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_ARG;
 		}
 		else if (arglen == 3)
 		{
 			if (arg == "pop")
 				ret1 = 0x18;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_ARG;
 		}
 		else if (arglen == 4 && arg[0] == 'p')
 		{
@@ -455,7 +455,7 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 			else if (arg == "peek")
 				ret1 = 0x19;
 			else
-				return _ERR_ASM_ILLEGAL;
+				return _ERR_ASM_ILLEGAL_ARG;
 		}
 		else if (arg.substr(0, 4) == "pick")
 		{
@@ -464,7 +464,7 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 			inslen = 2;
 		}
 		else
-			return _ERR_ASM_ILLEGAL;
+			return _ERR_ASM_ILLEGAL_ARG;
 	}
 	return inslen;
 }

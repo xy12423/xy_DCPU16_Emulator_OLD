@@ -246,19 +246,37 @@ struct label
 		pos = _pos;
 	}
 };
-typedef std::list<label> stringList;
+typedef list<label> stringList;
+
+struct gapPoint
+{
+	USHORT pos, len;
+	gapPoint();
+	gapPoint(USHORT _pos, USHORT _len)
+	{
+		pos = _pos;
+		len = _len;
+	}
+};
+typedef list<gapPoint> gapList;
 
 void generate(string path)
 {
-	USHORT add = 0;
 	ifstream file(path);
 	char line[100];
 	int lineCount = 0;
 	string insline;
-	stringList lblLst;
-	stringList pendLst;
+	stringList lblLst, pendLst;
+	gapList gapLst;
+	string lbl;
 	int pendCount = 0;
-	stringList::const_iterator lblitr, lblend;
+	int markPos = string::npos;
+	stringList::const_iterator lblBeg, lblItr, lblEnd;
+	stringList::const_iterator pendItr, pendEnd;
+	gapList::const_iterator gapItr, gapEnd;
+	USHORT *m = new USHORT[65536];
+	USHORT add = 0;
+	int len = 0, i;
 	while (!file.eof())
 	{
 		lineCount++;
@@ -266,24 +284,16 @@ void generate(string path)
 		insline = line;
 		if (insline.length() < 1)
 			continue;
-		int markPos = insline.find(':');
+		markPos = insline.find(':');
 		if (markPos != string::npos)
 		{
-			string lbl = insline.substr(0, markPos);
-			lblLst.push_back(label(lbl, add));
+			lbl = insline.substr(0, markPos);
 			insline.erase(0, markPos + 1);
+			lblLst.push_back(label(lbl, add));
 		}
 		if (insline.length() < 1)
 			continue;
-		lblitr = lblLst.cbegin();
-		lblend = lblLst.cend();
-		for (; lblitr != lblend; lblitr++)
-		{
-			markPos = insline.find((*lblitr).str);
-			if (markPos != string::npos)
-				insline = insline.substr(0, markPos) + "0x" + toHEX((*lblitr).pos) + insline.substr(markPos + (*lblitr).str.length());
-		}
-		int len = assembler(insline, m_ret, INS_RET_LEN);
+		len = assembler(insline, m_ret, INS_RET_LEN);
 		switch (len)
 		{
 			case _ERR_ASM_NOT_SUPPORTED:
@@ -295,16 +305,62 @@ void generate(string path)
 				goto _g_end;
 			case _ERR_ASM_ILLEGAL_ARG:
 				pendLst.push_back(label(insline, add));
-				pendCount++;
 				add += 3;
+				pendCount++;
 				break;
 			default:
-				for (int i = 0; i < len; i++, add++)
-					mem[add] = m_ret[i];
+				for (i = 0; i < len; i++, add++)
+					m[add] = m_ret[i];
 		}
 	}
-	if (pendCount != 0)
-		cout << "" << endl;
+	pendEnd = pendLst.cend();
+	lblBeg = lblLst.cbegin();
+	lblEnd = lblLst.cend();
+	int insLenAll = add;
+	for (pendItr = pendLst.cbegin(); pendItr != pendEnd; pendItr++)
+	{
+		insline = pendItr->str;
+		for (lblItr = lblBeg; lblItr != lblEnd; lblItr++)
+		{
+			markPos = insline.find(lblItr->str);
+			if (markPos != string::npos)
+				insline = insline.substr(0, markPos) + "0x" + toHEX(lblItr->pos) + insline.substr(markPos + lblItr->str.length());
+			markPos = insline.find(lblItr->str);
+			if (markPos != string::npos)
+				insline = insline.substr(0, markPos) + "0x" + toHEX(lblItr->pos) + insline.substr(markPos + lblItr->str.length());
+		}
+		len = assembler(insline, m_ret, INS_RET_LEN);
+		add = pendItr->pos;
+		switch (len)
+		{
+			case _ERR_ASM_NOT_SUPPORTED:
+				cout << "Instruction " << pendItr->str << " is not supported" << endl;
+				goto _g_end;
+			case _ERR_ASM_ILLEGAL:
+			case _ERR_ASM_ILLEGAL_OP:
+			case _ERR_ASM_ILLEGAL_ARG:
+				cout << "Illegal instruction " << pendItr->str << endl;
+				goto _g_end;
+			default:
+				for (i = 0; i < len; i++, add++)
+					m[add] = m_ret[i];
+				gapLst.push_back(gapPoint(add + len - 1, 3 - len));
+		}
+	}
+	gapItr = gapLst.cbegin();
+	gapEnd = gapLst.cend();
+	int shift = 0;
+	for (i = 0; i < insLenAll; i++)
+	{
+		if (gapItr->pos == i)
+		{
+			shift += gapItr->len;
+			gapItr++;
+		}
+		else
+			mem[i] = m[i + shift];
+	}
+	delete[] m;
 	_g_end:file.close();
 }
 
