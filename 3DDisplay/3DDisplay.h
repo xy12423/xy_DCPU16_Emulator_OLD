@@ -113,7 +113,7 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 	char argv[] = "\0";
 	char *argv2[] = { argv };
 	glutInit(&argc, argv2);
-	glutCreateWindow("Monitor");
+	glutCreateWindow("3D Vector Display");
 	glutReshapeFunc(ReSizeGLScene);
 	glutDisplayFunc(&myDisplay);
 	//glutTimerFunc(20, &ClockMain, 0);
