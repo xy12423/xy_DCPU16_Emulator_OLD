@@ -119,6 +119,12 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 	//glutTimerFunc(20, &ClockMain, 0);
 	timeSetEvent(20, 1, &ClockMain, 0, TIME_PERIODIC);
 	//glutIdleFunc(&ClockMain);
+	glShadeModel(GL_SMOOTH);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+	glClearDepth(1.0f);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	while (1)
 	{
 		glutMainLoopEvent();
