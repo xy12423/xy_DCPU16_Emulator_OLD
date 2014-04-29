@@ -167,7 +167,8 @@ std::string toHEX(unsigned int n)
 	ss << std::hex << n;
 	ss >> ret;
 	if (ret.length() < 4)
-		ret = std::string(4 - ret.length(), '0') + ucase(ret);
+		ret = std::string(4 - ret.length(), '0') + ret;
+	ret = ucase(ret);
 	return ret;
 }
 
