@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "core-class/main.h"
 #include "core/main.h"
 using namespace std;
 

@@ -19,6 +19,9 @@
     <Filter Include="Emulator">
       <UniqueIdentifier>{ef8ba43b-ff4e-4889-b188-38d621896d27}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Emulator-Class">
+      <UniqueIdentifier>{7dbfc5f0-69d8-4953-ad48-05727f1e4848}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -59,6 +62,24 @@
     </ClInclude>
     <ClInclude Include="core\main.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="core-class\define.h">
+      <Filter>Emulator-Class</Filter>
+    </ClInclude>
+    <ClInclude Include="core-class\emulator.h">
+      <Filter>Emulator-Class</Filter>
+    </ClInclude>
+    <ClInclude Include="core-class\export.h">
+      <Filter>Emulator-Class</Filter>
+    </ClInclude>
+    <ClInclude Include="core-class\function.h">
+      <Filter>Emulator-Class</Filter>
+    </ClInclude>
+    <ClInclude Include="core-class\switch.h">
+      <Filter>Emulator-Class</Filter>
+    </ClInclude>
+    <ClInclude Include="core-class\main.h">
+      <Filter>Emulator-Class</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

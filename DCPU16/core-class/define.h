@@ -1,9 +1,7 @@
 #pragma once
 
-#ifndef _H_EMU_DF
-#define _H_EMU_DF
-
 #ifndef _H_EMU_CLS_DF
+#define _H_EMU_CLS_DF
 
 typedef unsigned short int USHORT;
 typedef unsigned int UINT;
@@ -42,19 +40,5 @@ typedef void(__cdecl *fSetHandle)(void *, void *, void *, void *, void *);
 #ifndef min
 #define min(a,b)            (((a) < (b)) ? (a) : (b))
 #endif
-
-#endif
-
-USHORT mem[0x10000];
-USHORT reg[8];
-UINT pc;
-bool pcOf = false;
-USHORT sp, ex, ia;
-USHORT itr[256];
-unsigned char itrp = 0, itre = 0;
-bool itri = true;
-hardware hwt[65536];
-UINT hwn = 0;
-
 
 #endif
