@@ -12,6 +12,7 @@ public:
 
 	int doCode();
 	void doCodeThread();
+	void timerFunc(int freqkHZ);
 
 	int __cdecl setMem(USHORT add, USHORT dat);
 	int __cdecl getMem(USHORT add, USHORT *dat);
@@ -22,9 +23,9 @@ private:
 	//Global var
 	USHORT mem[0x10000];
 	USHORT reg[8];
-	UINT pc;
+	UINT pc = 0;
 	bool pcOf = false;
-	USHORT sp, ex, ia;
+	USHORT sp = 0, ex = 0, ia = 0;
 	USHORT itr[256];
 	unsigned char itrp = 0, itre = 0;
 	bool itri = true;
@@ -53,5 +54,11 @@ private:
 #include "function.h"
 #include "export.h"
 #include "emulator.h"
+
+DCPU16::DCPU16()
+{
+	memset(mem, 0, sizeof(mem));
+	memset(reg, 0, sizeof(reg));
+}
 
 #endif

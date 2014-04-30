@@ -28,6 +28,7 @@ hardware hdEmpty;
 
 typedef hardware(__cdecl *fGetInfo)();
 typedef void(__cdecl *fSetHandle)(void *, void *, void *, void *, void *);
+typedef int(__cdecl *fInit)();
 
 #define _ERR_EMU_NOERR 0
 #define _ERR_EMU_OTHER -1

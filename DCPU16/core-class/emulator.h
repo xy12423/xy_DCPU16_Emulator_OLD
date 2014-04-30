@@ -306,4 +306,9 @@ void DCPU16::doCodeThread()
 	}
 }
 
+void DCPU16::timerFunc(int freqkHZ)
+{
+	dcpu16_emu::cycleAll += freqkHZ;
+}
+
 #endif

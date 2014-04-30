@@ -1,11 +1,8 @@
 #include "stdafx.h"
-#include "core-class/main.h"
 #include "core/main.h"
 using namespace std;
 
 #define INS_RET_LEN 65536
-
-typedef int(__cdecl *fInit)();
 
 USHORT m_ret[INS_RET_LEN];
 string m_arg[INS_RET_LEN];
