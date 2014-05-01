@@ -88,7 +88,23 @@ int __cdecl intrptKeyb()
 	(*getReg)(0, &itr);
 	switch (itr)
 	{
-
+		case 0:
+			keyList.clear();
+			break;
+		case 1:
+			(*setReg)(2, keyList.front());
+			keyList.pop_front();
+			break;
+		case 2:
+			(*getReg)(1, &itr);
+			if (keys[itr])
+				(*setReg)(2, 1);
+			else
+				(*setReg)(2, 0);
+			break;
+		case 3:
+			(*getReg)(1, &keyItr);
+			break;
 	}
 	return cycle;
 }

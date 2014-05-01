@@ -18,7 +18,8 @@ BOOL	active = TRUE;
 
 //Keyboard
 
-
+std::list<BYTE> keyList;
+USHORT keyItr = 0;
 
 //Monitor
 
@@ -28,6 +29,8 @@ struct color
 };
 
 color mem[128][96];
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 BOOL DrawGLScene(GLvoid)
 {
@@ -215,8 +218,141 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
 	return TRUE;									// Success
 }
 
+bool bigLetter = false;
+USHORT numShift[10] = { 
+	0x29,
+	0x21,
+	0x40,
+	0x23,
+	0x24,
+	0x25,
+	0x5E,
+	0x26,
+	0x2A,
+	0x28 
+};
+
+USHORT getDCKeyCode(UINT nativeKC)
+{
+	if (0x41 <= nativeKC && nativeKC <= 0x5A)
+	{
+		if (bigLetter)
+			return nativeKC;
+		else
+			return nativeKC + 0x20;
+	}
+	else if (0x30 <= nativeKC && nativeKC <= 0x39)
+	{
+		if (keys[0x90])
+			return numShift[nativeKC - 0x30];
+		else
+			return nativeKC;
+	}
+	else if (0x60 <= nativeKC && nativeKC <= 0x69)
+	{
+		return nativeKC - 0x30;
+	}
+	switch (nativeKC)
+	{
+		case 0x8:
+			return 0x10;
+		case 0xD:
+			return 0x11;
+		case 0x2D:
+			return 0x12;
+		case 0x2E:
+			return 0x13;
+		case 0x26:
+			return 0x80;
+		case 0x28:
+			return 0x81;
+		case 0x25:
+			return 0x82;
+		case 0x27:
+			return 0x83;
+		case 0x10:
+			return 0x90;
+		case 0x11:
+			return 0x91;
+		case 0x20:
+			return 0x20;
+
+		case 0xC0:
+			if (keys[0x90])
+				return 0x7E;
+			else
+				return 0x60;
+		case 0xBD:
+			if (keys[0x90])
+				return 0x5F;
+			else
+				return 0x2D;
+		case 0xBB:
+			if (keys[0x90])
+				return 0x2B;
+			else
+				return 0x3D;
+
+		case 0xDB:
+			if (keys[0x90])
+				return 0x7B;
+			else
+				return 0x5B;
+		case 0xDD:
+			if (keys[0x90])
+				return 0x7D;
+			else
+				return 0x5D;
+		case 0xDC:
+			if (keys[0x90])
+				return 0x7C;
+			else
+				return 0x5C;
+
+		case 0xBA:
+			if (keys[0x90])
+				return 0x3A;
+			else
+				return 0x3B;
+		case 0xDE:
+			if (keys[0x90])
+				return 0x22;
+			else
+				return 0x27;
+
+		case 0xBC:
+			if (keys[0x90])
+				return 0x3C;
+			else
+				return 0x2C;
+		case 0xBE:
+			if (keys[0x90])
+				return 0x3E;
+			else
+				return 0x2E;
+		case 0xBF:
+			if (keys[0x90])
+				return 0x3F;
+			else
+				return 0x2F;
+
+		case 0x6A:
+			return 0x2A;
+		case 0x6B:
+			return 0x2B;
+		case 0x6D:
+			return 0x2D;
+		case 0x6E:
+			return 0x2E;
+		case 0x6F:
+			return 0x2F;
+	}
+	return 0;
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	bool oldBigLetter;
 	switch (uMsg)
 	{
 		case WM_ACTIVATE:
@@ -225,26 +361,95 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			else
 				active = FALSE;
 			return 0;
-		case WM_SYSCOMMAND:							// Intercept System Commands
-			switch (wParam)							// Check System Calls
+		case WM_SYSCOMMAND:
+			switch (wParam)
 			{
-				case SC_SCREENSAVE:					// Screensaver Trying To Start?
-				case SC_MONITORPOWER:				// Monitor Trying To Enter Powersave?
-					return 0;							// Prevent From Happening
+				case SC_SCREENSAVE:
+				case SC_MONITORPOWER:
+					return 0;
 			}
-			break;									// Exit
-		case WM_CLOSE:								// Did We Receive A Close Message?
-			PostQuitMessage(0);						// Send A Quit Message
-			return 0;								// Jump Back
-		case WM_KEYDOWN:							// Is A Key Being Held Down?
-			keys[wParam] = TRUE;					// If So, Mark It As TRUE
-			return 0;								// Jump Back
-		case WM_KEYUP:								// Has A Key Been Released?
-			keys[wParam] = FALSE;					// If So, Mark It As FALSE
-			return 0;								// Jump Back
-		case WM_SIZE:								// Resize The OpenGL Window
-			ReSizeGLScene(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
-			return 0;								// Jump Back
+			break;
+		case WM_CLOSE:
+			PostQuitMessage(0);
+			return 0;
+		case WM_KEYDOWN:
+			oldBigLetter = bigLetter;
+			if (wParam == 0x14)
+				bigLetter = !bigLetter;
+			if (wParam == 0x10)
+				bigLetter = !bigLetter;
+			if (oldBigLetter != bigLetter)
+			{
+				if (oldBigLetter)
+				{
+					for (int i = 0x41; i <= 0x5A; i++)
+					{
+						if (keys[i])
+						{
+							keys[i] = false;
+							keys[i + 0x20] = true;
+						}
+					}
+				}
+				else
+				{
+					for (int i = 0x61; i <= 0x7A; i++)
+					{
+						if (keys[i])
+						{
+							keys[i] = false;
+							keys[i - 0x20] = true;
+						}
+					}
+				}
+			}
+			wParam = getDCKeyCode(wParam);
+			if (wParam == 0)
+				return 0;
+			keys[wParam] = true;
+			keyList.push_back((BYTE)(wParam));
+			if (keyItr != 0)
+				(*additr)(keyItr);
+			return 0;
+		case WM_KEYUP:
+			oldBigLetter = bigLetter;
+			if (wParam == 0x10)
+				bigLetter = !bigLetter;
+			if (oldBigLetter != bigLetter)
+			{
+				if (oldBigLetter)
+				{
+					for (int i = 0x41; i <= 0x5A; i++)
+					{
+						if (keys[i])
+						{
+							keys[i] = false;
+							keys[i + 0x20] = true;
+						}
+					}
+				}
+				else
+				{
+					for (int i = 0x61; i <= 0x7A; i++)
+					{
+						if (keys[i])
+						{
+							keys[i] = false;
+							keys[i - 0x20] = true;
+						}
+					}
+				}
+			}
+			wParam = getDCKeyCode(wParam);
+			if (wParam == 0)
+				return 0;
+			keys[wParam] = false;
+			if (keyItr != 0)
+				(*additr)(keyItr);
+			return 0;
+		case WM_SIZE:
+			ReSizeGLScene(LOWORD(lParam), HIWORD(lParam));
+			return 0;
 		case 0xFFFF:
 			DrawGLScene();
 			return 0;

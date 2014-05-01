@@ -271,7 +271,7 @@ int doCode()
 	if (itri)
 	{
 		USHORT itrt = 0;
-		if (popitr(itrt) != _ERR_EMU_ITR_EMPTY && ia != 0)
+		if (ia != 0 && popitr(itrt) != _ERR_EMU_ITR_EMPTY)
 		{
 			itri = false;
 			mem[--sp] = pc;

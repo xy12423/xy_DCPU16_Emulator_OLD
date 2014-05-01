@@ -25,3 +25,4 @@
 #pragma comment(lib,"glu32.lib")
 
 #include <ctime>
+#include <list>
