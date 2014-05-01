@@ -4,12 +4,12 @@
 #define _H_EXP
 
 #include "defines.h"
-#include "Monitor.h"
+#include "main.h"
 
-#define HW_COUNT 1
+#define HW_COUNT 2
 hardware info[HW_COUNT];
 
-int __cdecl intrpt()
+int __cdecl intrptMonitor()
 {
 	USHORT itr = 0;
 	int cycle = 0;
@@ -81,9 +81,21 @@ int __cdecl intrpt()
 	return cycle;
 }
 
+int __cdecl intrptKeyb()
+{
+	USHORT itr = 0;
+	int cycle = 0;
+	(*getReg)(0, &itr);
+	switch (itr)
+	{
+
+	}
+	return cycle;
+}
+
 extern "C" __declspec(dllexport) int __cdecl getHWCount()
 {
-	return HW_COUNT;
+	return 1;
 }
 
 extern "C" __declspec(dllexport) hardware __cdecl getInfo(int count)

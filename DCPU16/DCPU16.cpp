@@ -261,6 +261,11 @@ typedef list<gapPoint> gapList;
 void generate(string path)
 {
 	ifstream file(path);
+	if (!file.is_open())
+	{
+		cout << "  ^ Error" << endl;
+		return;
+	}
 	char line[100];
 	int lineCount = 0;
 	string insline;
@@ -357,15 +362,14 @@ void generate(string path)
 	gapItr = gapLst.cbegin();
 	gapEnd = gapLst.cend();
 	int shift = 0;
-	for (i = 0; i < insLenAll; i++)
+	for (i = 0; i + shift < insLenAll; i++)
 	{
 		if (gapItr->pos == i)
 		{
 			shift += gapItr->len;
 			gapItr++;
 		}
-		else
-			mem[i] = m[i + shift];
+		mem[i] = m[i + shift];
 	}
 	delete[] m;
 	_g_end:file.close();
