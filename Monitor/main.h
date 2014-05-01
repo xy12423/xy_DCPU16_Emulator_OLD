@@ -41,6 +41,7 @@ BOOL DrawGLScene(GLvoid)
 			glRectf((GLfloat)(i), (GLfloat)(-j), (GLfloat)(i + 1), (GLfloat)(-j - 1));
 		}
 	glFlush();
+	SwapBuffers(hDC);
 	return TRUE;
 }
 
@@ -265,6 +266,12 @@ LRESULT CALLBACK WndProc(HWND	hWnd,
 			ReSizeGLScene(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
 			return 0;								// Jump Back
 		}
+
+		case 0xFFFF:
+		{
+			DrawGLScene();
+			return 0;
+		}
 	}
 
 	// Pass All Unhandled Messages To DefWindowProc
@@ -406,6 +413,7 @@ void CALLBACK ClockMain(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw
 			i++;
 		}
 	}
+	PostMessage(hWnd, 0xFFFF, 0, 0);
 	return;
 }
 
@@ -418,9 +426,11 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 	if (!CreateGLWindow("Monitor", 128 * unitLen, 96 * unitLen, 16, false))
 		return 0;
 
+	DrawGLScene();
+
 	while (!done)
 	{
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))	// Is There A Message Waiting?
+		if (GetMessage(&msg, NULL, 0, 0))	// Is There A Message Waiting?
 		{
 			if (msg.message == WM_QUIT)
 				done = TRUE;
@@ -429,11 +439,6 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
-		}
-		else
-		{
-			DrawGLScene();
-			SwapBuffers(hDC);
 		}
 	}
 
