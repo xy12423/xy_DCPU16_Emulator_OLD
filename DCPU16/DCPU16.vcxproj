@@ -82,12 +82,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="core-class\define.h" />
-    <ClInclude Include="core-class\emulator.h" />
-    <ClInclude Include="core-class\export.h" />
-    <ClInclude Include="core-class\function.h" />
-    <ClInclude Include="core-class\main.h" />
-    <ClInclude Include="core-class\switch.h" />
     <ClInclude Include="core\assembler\assembler.h" />
     <ClInclude Include="core\assembler\define.h" />
     <ClInclude Include="core\assembler\function.h" />
