@@ -515,6 +515,14 @@ int mainLoop()
 ifstream fin;
 ofstream logout("log.log");
 
+#define FUNC_COUNT 3
+char *funcName[FUNC_COUNT] = {
+	"getHWCount",
+	"getInfo",
+	"setHandle"
+};
+FARPROC funcAdd[FUNC_COUNT];
+
 int main(int argc, char* argv[], char* envp[])
 {
 	fin.open("plugins.txt");
@@ -554,26 +562,26 @@ int main(int argc, char* argv[], char* envp[])
 					continue;
 				}
 			}
-			hd = GetProcAddress(plugin, "getInfo");
-			if (hd != NULL)
+			bool loadSuccess = true;
+			for (i = 0; i < FUNC_COUNT; i++)
 			{
-				hwt[hwn++] = ((fGetInfo)(*hd))();
-				hd = GetProcAddress(plugin, "setHandle");
-				if (hd != NULL)
+				hd = GetProcAddress(plugin, funcName[i]);
+				if (hd == NULL)
 				{
-					((fSetHandle)(*hd))(&setMem, &getMem, &setReg, &getReg, &additr);
-				}
-				else
-				{
-					hwt[--hwn] = hdEmpty;
-					logout << "Failed to find function entry point \"setHandle\" in plugin " << filename << endl;
+					logout << "Failed to find function entry point " << funcName[i] << " in plugin " << filename << endl;
 					FreeLibrary(plugin);
+					loadSuccess = false;
+					break;
 				}
+				funcAdd[i] = hd;
 			}
-			else
+			if (loadSuccess)
 			{
-				logout << "Failed to find function entry point \"getInfo\" in plugin " << filename << endl;
-				FreeLibrary(plugin);
+				int hwCount = ((fGetHWCount)(*funcAdd[0]))();
+				hd = funcAdd[1];
+				for (i = 0; i < hwCount; i++)
+					hwt[hwn++] = ((fGetInfo)(*hd))(i);
+				((fSetHandle)(*funcAdd[2]))(&setMem, &getMem, &setReg, &getReg, &additr);
 			}
 		}
 		else

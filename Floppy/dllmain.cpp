@@ -12,12 +12,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		info.a = 0x24C5;
-		info.b = 0x4FD5;
-		info.c = 0x000B;
-		info.x = 0x7E91;
-		info.y = 0x1EB3;
-		info.hwi = &intrpt;
+		info[0].a = 0x24C5;
+		info[0].b = 0x4FD5;
+		info[0].c = 0x000B;
+		info[0].x = 0x7E91;
+		info[0].y = 0x1EB3;
+		info[0].hwi = &intrpt;
 		break;
 	case DLL_THREAD_ATTACH:
 		break;

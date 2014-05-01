@@ -5,7 +5,8 @@
 
 #include "clock.h"
 
-hardware info;
+#define HW_COUNT 1
+hardware info[HW_COUNT];
 
 typedef hardware(*fGetInfo)();
 typedef void(*fSetHandle)(void *, void *, void *, void *, void *);
@@ -47,9 +48,14 @@ int __cdecl intrpt()
 	return cycle;
 }
 
-extern "C" __declspec(dllexport) hardware __cdecl getInfo()
+extern "C" __declspec(dllexport) int __cdecl getHWCount()
 {
-	return info;
+	return HW_COUNT;
+}
+
+extern "C" __declspec(dllexport) hardware __cdecl getInfo(int count)
+{
+	return info[count];
 }
 
 extern "C" __declspec(dllexport) void __cdecl setHandle(void *p1, void *p2, void *p3, void *p4, void *p5)

@@ -6,7 +6,8 @@
 #include "defines.h"
 #include "floppy.h"
 
-hardware info;
+#define HW_COUNT 1
+hardware info[HW_COUNT];
 ULONGLONG thrArg;
 
 int __cdecl intrpt()
@@ -80,9 +81,14 @@ extern "C" __declspec(dllexport) int init()
 	return ret;
 }
 
-extern "C" __declspec(dllexport) hardware __cdecl getInfo()
+extern "C" __declspec(dllexport) int __cdecl getHWCount()
 {
-	return info;
+	return HW_COUNT;
+}
+
+extern "C" __declspec(dllexport) hardware __cdecl getInfo(int count)
+{
+	return info[count];
 }
 
 extern "C" __declspec(dllexport) void __cdecl setHandle(void *p1, void *p2, void *p3, void *p4, void *p5)

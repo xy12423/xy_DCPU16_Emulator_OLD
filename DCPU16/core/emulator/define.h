@@ -26,7 +26,8 @@ struct hardware
 
 hardware hdEmpty;
 
-typedef hardware(__cdecl *fGetInfo)();
+typedef int(__cdecl *fGetHWCount)();
+typedef hardware(__cdecl *fGetInfo)(int n);
 typedef void(__cdecl *fSetHandle)(void *, void *, void *, void *, void *);
 typedef int(__cdecl *fInit)();
 
