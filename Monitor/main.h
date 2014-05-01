@@ -8,7 +8,17 @@
 #include "defines.h"
 #include "stdafx.h"
 
+HDC			hDC = NULL;
+HGLRC		hRC = NULL;
+HWND		hWnd = NULL;
+HINSTANCE	hInstance;
+
+bool	keys[256];
+BOOL	active = TRUE;
+
 //Keyboard
+
+
 
 //Monitor
 
@@ -18,16 +28,6 @@ struct color
 };
 
 color mem[128][96];
-
-HDC			hDC = NULL;
-HGLRC		hRC = NULL;
-HWND		hWnd = NULL;
-HINSTANCE	hInstance;
-
-bool	keys[256];
-BOOL	active = TRUE;
-
-LRESULT	CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 BOOL DrawGLScene(GLvoid)
 {
@@ -215,25 +215,17 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits, bool fullscree
 	return TRUE;									// Success
 }
 
-LRESULT CALLBACK WndProc(HWND	hWnd,
-	UINT	uMsg,
-	WPARAM	wParam,
-	LPARAM	lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
 		case WM_ACTIVATE:
-		{
 			if (!HIWORD(wParam))
 				active = TRUE;
 			else
 				active = FALSE;
-
 			return 0;
-		}
-
 		case WM_SYSCOMMAND:							// Intercept System Commands
-		{
 			switch (wParam)							// Check System Calls
 			{
 				case SC_SCREENSAVE:					// Screensaver Trying To Start?
@@ -241,37 +233,21 @@ LRESULT CALLBACK WndProc(HWND	hWnd,
 					return 0;							// Prevent From Happening
 			}
 			break;									// Exit
-		}
-
 		case WM_CLOSE:								// Did We Receive A Close Message?
-		{
 			PostQuitMessage(0);						// Send A Quit Message
 			return 0;								// Jump Back
-		}
-
 		case WM_KEYDOWN:							// Is A Key Being Held Down?
-		{
 			keys[wParam] = TRUE;					// If So, Mark It As TRUE
 			return 0;								// Jump Back
-		}
-
 		case WM_KEYUP:								// Has A Key Been Released?
-		{
 			keys[wParam] = FALSE;					// If So, Mark It As FALSE
 			return 0;								// Jump Back
-		}
-
 		case WM_SIZE:								// Resize The OpenGL Window
-		{
 			ReSizeGLScene(LOWORD(lParam), HIWORD(lParam));  // LoWord=Width, HiWord=Height
 			return 0;								// Jump Back
-		}
-
 		case 0xFFFF:
-		{
 			DrawGLScene();
 			return 0;
-		}
 	}
 
 	// Pass All Unhandled Messages To DefWindowProc

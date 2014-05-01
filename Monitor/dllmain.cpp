@@ -42,8 +42,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	case DLL_THREAD_DETACH:
 		break;
 	case DLL_PROCESS_DETACH:
-		if (GetCurrentThread() == mainThread)
-			CloseHandle(mainThread);
+		PostMessage(hWnd, WM_QUIT, 0, 0);
 		break;
 	}
 	return TRUE;
