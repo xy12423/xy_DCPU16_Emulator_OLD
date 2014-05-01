@@ -258,7 +258,7 @@ struct gapPoint
 };
 typedef list<gapPoint> gapList;
 
-void generate(string path)
+void generate(string path, string arg = "")
 {
 	ifstream file(path);
 	if (!file.is_open())
@@ -278,7 +278,7 @@ void generate(string path)
 	stringList::const_iterator pendItr, pendEnd;
 	gapList::const_iterator gapItr, gapEnd;
 	USHORT *m = new USHORT[65536];
-	USHORT add = 0;
+	USHORT add = toNum(arg);
 	int len = 0, i;
 	while (!file.eof())
 	{
@@ -380,7 +380,7 @@ void printUsage()
 	cout << "assemble\tA [address]" << endl;		//
 	cout << "dump\t\tD [address]" << endl;			//
 	cout << "enter\t\tE address [list]" << endl;	//
-	cout << "generate" << endl;						//
+	cout << "generate [address]" << endl;						//
 	cout << "load\t\tL address" << endl;			//
 	cout << "name\t\tN path" << endl;				//
 	cout << "proceed\t\tP" << endl;					//
@@ -505,7 +505,7 @@ int mainLoop()
 				file.close();
 				break;
 			case 'g':
-				generate(filePath);
+				generate(filePath, m_arg[0]);
 				break;
 			default:
 				cout << "  ^ Error" << endl;
