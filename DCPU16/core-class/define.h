@@ -42,4 +42,6 @@ typedef int(__cdecl *fInit)();
 #define min(a,b)            (((a) < (b)) ? (a) : (b))
 #endif
 
+#include <cstring>
+
 #endif
