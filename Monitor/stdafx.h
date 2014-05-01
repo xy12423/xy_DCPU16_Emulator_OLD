@@ -8,6 +8,8 @@
 #define WIN32_LEAN_AND_MEAN             //  从 Windows 头文件中排除极少使用的信息
 // Windows 头文件: 
 #include <Windows.h>
+#pragma comment(lib,"user32.lib")
+#pragma comment(lib,"gdi32.lib")
 #include <MMSystem.h>
 #pragma comment(lib, "winmm.lib")
 
@@ -16,10 +18,6 @@
 
 #include <gl\gl.h>
 #include <gl\glu.h>
-#ifndef _DEBUG
-#pragma comment(lib,"freeglut_static_dll.lib")
-#endif
-#include <gl\freeglut.h>
 
 #pragma comment(lib,"opengl32.lib")
 #pragma comment(lib,"glu32.lib")
