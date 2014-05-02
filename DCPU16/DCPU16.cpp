@@ -380,7 +380,7 @@ void printUsage()
 	cout << "assemble\tA [address]" << endl;		//
 	cout << "dump\t\tD [address]" << endl;			//
 	cout << "enter\t\tE address [list]" << endl;	//
-	cout << "generate [address]" << endl;			//
+	cout << "generate\tG [address]" << endl;		//
 	cout << "load\t\tL address" << endl;			//
 	cout << "name\t\tN path" << endl;				//
 	cout << "proceed\t\tP" << endl;					//
