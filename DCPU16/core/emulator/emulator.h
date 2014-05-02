@@ -105,18 +105,26 @@ int doL3()
 			break;
 		case 0x02:
 			res = b + a;
+			ex = res >> 16;
+			res = res & 0xFFFF;
 			cycle = cycleA + 2;
 			break;
 		case 0x03:
 			res = b - a;
+			ex = res >> 16;
+			res = res & 0xFFFF;
 			cycle = cycleA + 2;
 			break;
 		case 0x04:
 			res = b * a;
+			ex = res >> 16;
+			res = res & 0xFFFF;
 			cycle = cycleA + 2;
 			break;
 		case 0x05:
-			res = (UINT)((int)(b) * (int)(a));
+			res = (USHORT)((short int)(b) * (short int)(a));
+			ex = res >> 16;
+			res = res & 0xFFFF;
 			cycle = cycleA + 2;
 			break;
 		case 0x06:
@@ -140,9 +148,9 @@ int doL3()
 			}
 			else
 			{
-				int sa = (int)(a), sb = (int)(b);
-				res = (UINT)(sa / sb) & 0xFFFF;
-				ex = (UINT)((b * 65536) / a);
+				short int sa = (short int)(a), sb = (short int)(b);
+				res = (USHORT)(sa / sb);
+				ex = (USHORT)((b * 65536) / a);
 			}
 			cycle = cycleA + 3;
 			break;
@@ -150,7 +158,7 @@ int doL3()
 			if (a == 0)
 				res = 0;
 			else
-				res = (UINT)(b % a) & 0xFFFF;
+				res = (USHORT)(b % a);
 			cycle = cycleA + 3;
 			break;
 		case 0x09:
@@ -158,8 +166,8 @@ int doL3()
 				res = 0;
 			else
 			{
-				int sa = (int)(a), sb = (int)(b);
-				res = (UINT)(sa % sb) & 0xFFFF;
+				short int sa = (short int)(a), sb = (short int)(b);
+				res = (USHORT)(sa % sb);
 			}
 			cycle = cycleA + 3;
 			break;
@@ -232,10 +240,14 @@ int doL3()
 			break;
 		case 0x1A:
 			res = b + a + ex;
+			ex = res >> 16;
+			res = res & 0xFFFF;
 			cycle = cycleA + 3;
 			break;
 		case 0x1B:
 			res = b - a + ex;
+			ex = res >> 16;
+			res = res & 0xFFFF;
 			cycle = cycleA + 3;
 			break;
 		case 0x1E:
@@ -255,8 +267,7 @@ int doL3()
 	}
 	if ((0x01 <= op && op <= 0x05) || op == 0x1A || op == 0x1B)
 	{
-		ex = res >> 16;
-		res = res & 0xFFFF;
+		
 	}
 	if (op < 0x10 || 0x17 < op)
 		setb(ocode.b, res, cycleA);
