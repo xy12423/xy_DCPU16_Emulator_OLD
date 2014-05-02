@@ -214,7 +214,7 @@ int retOpNum3(std::string op, USHORT &ret)
 
 int retOpStr1(USHORT op, std::string &ret)
 {
-	return _ERR_ASM_ILLEGAL_OP;
+	return _ERR_ASM_ILLEGAL;
 }
 
 std::string op2[] = {
@@ -366,10 +366,13 @@ int retGRegStr(USHORT reg, std::string &ret)
 int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 {
 	int inslen = 1;
+	long long temp = 0;
 	if (arg[0] == '[')
 	{
 		arg.erase(0, 1);
 		arg.erase(arg.length() - 1, 1);
+		if (calcStr(arg, temp) == 0)
+			arg = "0x" + toHEX((USHORT)(temp));
 		if (arg.length() < 1)
 			return _ERR_ASM_ILLEGAL;
 		int plusPos = arg.find('+');
@@ -430,61 +433,66 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 			}
 		}
 	}
-	else if (canBeNum(arg))
-	{
-		short int n = (USHORT)toNum(arg);
-		if (-1 <= n && n <= 30)
-			ret1 = (USHORT)(n + 0x21);
-		else
-		{
-			ret1 = 0x1F;
-			ret2 = (USHORT)(n);
-			inslen = 2;
-		}
-	}
 	else
 	{
-		int arglen = arg.length();
-		if (arglen == 1)
+		if (calcStr(arg, temp) == 0)
+			arg = "0x" + toHEX((USHORT)(temp));
+		if (canBeNum(arg))
 		{
-			if (retGRegNum(arg, ret1) == _ERR_ASM_ILLEGAL)
-				return _ERR_ASM_ILLEGAL_ARG;
-		}
-		else if (arglen == 2)
-		{
-			if (arg == "sp")
-				ret1 = 0x1B;
-			else if (arg == "pc")
-				ret1 = 0x1C;
-			else if (arg == "ex")
-				ret1 = 0x1D;
+			short int n = (USHORT)toNum(arg);
+			if (-1 <= n && n <= 30)
+				ret1 = (USHORT)(n + 0x21);
 			else
-				return _ERR_ASM_ILLEGAL_ARG;
-		}
-		else if (arglen == 3)
-		{
-			if (arg == "pop")
-				ret1 = 0x18;
-			else
-				return _ERR_ASM_ILLEGAL_ARG;
-		}
-		else if (arglen == 4 && arg[0] == 'p')
-		{
-			if (arg == "push")
-				ret1 = 0x18;
-			else if (arg == "peek")
-				ret1 = 0x19;
-			else
-				return _ERR_ASM_ILLEGAL_ARG;
-		}
-		else if (arg.substr(0, 4) == "pick")
-		{
-			ret1 = 0x1A;
-			ret2 = (USHORT)toNum(arg.substr(5));
-			inslen = 2;
+			{
+				ret1 = 0x1F;
+				ret2 = (USHORT)(n);
+				inslen = 2;
+			}
 		}
 		else
-			return _ERR_ASM_ILLEGAL_ARG;
+		{
+			int arglen = arg.length();
+			if (arglen == 1)
+			{
+				if (retGRegNum(arg, ret1) == _ERR_ASM_ILLEGAL)
+					return _ERR_ASM_ILLEGAL_ARG;
+			}
+			else if (arglen == 2)
+			{
+				if (arg == "sp")
+					ret1 = 0x1B;
+				else if (arg == "pc")
+					ret1 = 0x1C;
+				else if (arg == "ex")
+					ret1 = 0x1D;
+				else
+					return _ERR_ASM_ILLEGAL_ARG;
+			}
+			else if (arglen == 3)
+			{
+				if (arg == "pop")
+					ret1 = 0x18;
+				else
+					return _ERR_ASM_ILLEGAL_ARG;
+			}
+			else if (arglen == 4 && arg[0] == 'p')
+			{
+				if (arg == "push")
+					ret1 = 0x18;
+				else if (arg == "peek")
+					ret1 = 0x19;
+				else
+					return _ERR_ASM_ILLEGAL_ARG;
+			}
+			else if (arg.substr(0, 4) == "pick")
+			{
+				ret1 = 0x1A;
+				ret2 = (USHORT)toNum(arg.substr(5));
+				inslen = 2;
+			}
+			else
+				return _ERR_ASM_ILLEGAL_ARG;
+		}
 	}
 	return inslen;
 }

@@ -65,6 +65,7 @@ bool canBeNum(std::string str)
 	int len = str.length(), level = -1;
 	if (len == 0)
 		return false;
+	str = lcase(str);
 	if (str[0] == '0' && len > 1)
 	{
 		if (len > 2 && str[1] == 'x')
@@ -97,6 +98,8 @@ bool canBeNum(std::string str)
 int toNum(std::string str, int type = 3)
 {
 	int ret = INT_MIN, len = str.length();
+	if (len < 1)
+		return 0;
 	std::stringstream ss;
 	if (str[len - 1] == 'h')
 	{
@@ -170,6 +173,141 @@ std::string toHEX(unsigned int n)
 		ret = std::string(4 - ret.length(), '0') + ret;
 	ret = ucase(ret);
 	return ret;
+}
+
+int opLv[128] = { 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+long long power(int a, int b)
+{
+	long long ret = 1;
+	for (int i = 0; i < b; i++)
+		ret *= a;
+	return ret;
+}
+
+int calcStr(std::string str, long long &ret)
+{
+	std::string num;
+	std::list<long long> numStack;
+	std::list<char> opStack;
+	std::string::const_iterator p, end = str.cend();
+	long long temp;
+	for (p = str.cbegin(); p != end; p++)
+	{
+		if (opLv[*p] != 0)
+		{
+			if (!canBeNum(num))
+				return -1;
+			numStack.push_back(toNum(num));
+			num = "";
+			if (opStack.empty())
+			{
+				opStack.push_back(*p);
+				continue;
+			}
+			while ((!opStack.empty()) && opLv[*p] <= opLv[opStack.back()])
+			{
+				switch (opStack.back())
+				{
+					case '+':
+						temp = numStack.back();
+						numStack.pop_back();
+						temp += numStack.back();
+						numStack.pop_back();
+						numStack.push_back(temp);
+						break;
+					case '-':
+						temp = numStack.back();
+						numStack.pop_back();
+						temp = numStack.back() - temp;
+						numStack.pop_back();
+						numStack.push_back(temp);
+						break;
+					case '*':
+						temp = numStack.back();
+						numStack.pop_back();
+						temp *= numStack.back();
+						numStack.pop_back();
+						numStack.push_back(temp);
+						break;
+					case '/':
+						temp = numStack.back();
+						numStack.pop_back();
+						temp = numStack.back() / temp;
+						numStack.pop_back();
+						numStack.push_back(temp);
+						break;
+					case '^':
+						temp = numStack.back();
+						numStack.pop_back();
+						temp = power((int)(numStack.back()), (int)(temp));
+						numStack.pop_back();
+						numStack.push_back(temp);
+						break;
+					default:
+						return -1;
+				}
+				opStack.pop_back();
+			}
+			opStack.push_back(*p);
+		}
+		else
+			num.push_back(*p);
+	}
+	if (!canBeNum(num))
+		return -1;
+	numStack.push_back(toNum(num));
+	while (!opStack.empty())
+	{
+		switch (opStack.back())
+		{
+			case '+':
+				temp = numStack.back();
+				numStack.pop_back();
+				temp += numStack.back();
+				numStack.pop_back();
+				numStack.push_back(temp);
+				break;
+			case '-':
+				temp = numStack.back();
+				numStack.pop_back();
+				temp = numStack.back() - temp;
+				numStack.pop_back();
+				numStack.push_back(temp);
+				break;
+			case '*':
+				temp = numStack.back();
+				numStack.pop_back();
+				temp *= numStack.back();
+				numStack.pop_back();
+				numStack.push_back(temp);
+				break;
+			case '/':
+				temp = numStack.back();
+				numStack.pop_back();
+				temp = numStack.back() / temp;
+				numStack.pop_back();
+				numStack.push_back(temp);
+				break;
+			case '^':
+				temp = numStack.back();
+				numStack.pop_back();
+				temp = power((int)(numStack.back()), (int)(temp));
+				numStack.pop_back();
+				numStack.push_back(temp);
+				break;
+			default:
+				return -1;
+		}
+		opStack.pop_back();
+	}
+	ret = numStack.back();
+	return 0;
 }
 
 #endif

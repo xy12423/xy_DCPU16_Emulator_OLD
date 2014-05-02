@@ -122,7 +122,7 @@ int doL3()
 			cycle = cycleA + 2;
 			break;
 		case 0x05:
-			res = (USHORT)((short int)(b) * (short int)(a));
+			res = (UINT)((short int)(b) * (short int)(a));
 			ex = res >> 16;
 			res = res & 0xFFFF;
 			cycle = cycleA + 2;

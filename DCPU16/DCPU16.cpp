@@ -243,6 +243,10 @@ struct label
 		str = _str;
 		pos = _pos;
 	}
+	bool operator <(const label &n)
+	{
+		return str.length() > n.str.length();
+	}
 };
 typedef list<label> stringList;
 
@@ -277,14 +281,16 @@ void generate(string path, string arg = "")
 	stringList::const_iterator lblBeg, lblItr, lblEnd;
 	stringList::const_iterator pendItr, pendEnd;
 	gapList::const_iterator gapItr, gapEnd;
-	USHORT *m = new USHORT[65536];
 	USHORT add = toNum(arg);
+	USHORT *m = new USHORT[65536];
+	memset(m, 0, sizeof(USHORT) * 65536);
 	int len = 0, i;
 	while (!file.eof())
 	{
 		lineCount++;
 		file.getline(line, 100, '\n');
 		insline = line;
+		insline = trim(insline);
 		if (insline.length() < 1)
 			continue;
 		markPos = insline.find(':');
@@ -325,6 +331,7 @@ void generate(string path, string arg = "")
 					m[add] = m_ret[i];
 		}
 	}
+	lblLst.sort();
 	pendEnd = pendLst.cend();
 	lblBeg = lblLst.cbegin();
 	lblEnd = lblLst.cend();
@@ -351,7 +358,7 @@ void generate(string path, string arg = "")
 			case _ERR_ASM_ILLEGAL:
 			case _ERR_ASM_ILLEGAL_OP:
 			case _ERR_ASM_ILLEGAL_ARG:
-				cout << "Illegal instruction " << pendItr->str << endl;
+				cout << "Illegal instruction " << insline << endl;
 				goto _g_end;
 			default:
 				for (i = 0; i < len; i++, add++)
