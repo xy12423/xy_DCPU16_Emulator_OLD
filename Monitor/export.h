@@ -111,7 +111,7 @@ int __cdecl intrptKeyb()
 
 extern "C" __declspec(dllexport) int __cdecl getHWCount()
 {
-	return 1;
+	return HW_COUNT;
 }
 
 extern "C" __declspec(dllexport) hardware __cdecl getInfo(int count)
