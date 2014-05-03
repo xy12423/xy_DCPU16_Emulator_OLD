@@ -321,8 +321,9 @@ void generate(string path, string arg = "")
 		{
 			if (markPos == 0)
 			{
-				lbl = insline.substr(1);
-				insline = "";
+				markPos = insline.find(' ');
+				lbl = insline.substr(1, markPos + 1);
+				insline.erase(0, markPos + 1);
 				lblLst.push_back(label(lbl, add, add));
 			}
 			else
