@@ -11,7 +11,7 @@ std::string ltrim(std::string str)
 	int len = str.length();
 	int i;
 	for (i = 0; i < len;i++)
-		if (str[i] != ' ')
+		if (str[i] != ' ' && str[i] != '\t')
 			break;
 	return str.erase(0, i);
 }
@@ -21,7 +21,7 @@ std::string rtrim(std::string str)
 	int len = str.length();
 	int i;
 	for (i = len - 1; i > -1; i--)
-		if (str[i] != ' ')
+		if (str[i] != ' ' && str[i] != '\t')
 			break;
 	if (i < len - 1)
 		return str.erase(i + 1);

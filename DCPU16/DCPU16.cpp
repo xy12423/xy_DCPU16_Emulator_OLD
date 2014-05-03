@@ -277,20 +277,26 @@ void generate(string path, string arg = "")
 		cout << "  ^ Error" << endl;
 		return;
 	}
+
 	char line[100];
 	int lineCount = 0;
 	string insline;
+	int markPos = string::npos;
+	USHORT sysLblCount = 0;
+	string sysLabel;
+
 	stringList lblLst;
 	pendList pendLst;
 	string lbl;
 	int pendCount = 0;
-	int markPos = string::npos;
 	stringList::iterator lblBeg, lblItr, lblEnd;
 	list<stringList::iterator> lblUsedLst;
 	list<stringList::iterator>::const_iterator usedItr, usedEnd;
 	pendItem pendItm;
+
 	USHORT add = toNum(arg);
 	int len = 0, pendLen = 3, i;
+
 	memset(m, -1, sizeof(m));
 	while (!file.eof())
 	{
@@ -300,6 +306,14 @@ void generate(string path, string arg = "")
 		insline = trim(insline);
 		if (insline.length() < 1)
 			continue;
+		if (insline[0] == ';')
+			continue;
+		markPos = insline.find('$');
+		if (markPos != string::npos)
+		{
+			sysLabel = "__asm_sys_label_" + toHEX(sysLblCount);
+			insline = sysLabel + ":" + insline.substr(0, markPos) + sysLabel + insline.substr(markPos + sysLabel.length());
+		}
 		markPos = insline.find(':');
 		if (markPos != string::npos)
 		{
