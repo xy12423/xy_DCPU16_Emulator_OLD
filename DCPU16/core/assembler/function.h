@@ -6,17 +6,17 @@
 #include "define.h"
 #include <limits.h>
 
-std::string ltrim(std::string str)
+void ltrim(std::string &str)
 {
 	int len = str.length();
 	int i;
 	for (i = 0; i < len;i++)
 		if (str[i] != ' ' && str[i] != '\t')
 			break;
-	return str.erase(0, i);
+	str.erase(0, i);
 }
 
-std::string rtrim(std::string str)
+void rtrim(std::string &str)
 {
 	int len = str.length();
 	int i;
@@ -24,29 +24,28 @@ std::string rtrim(std::string str)
 		if (str[i] != ' ' && str[i] != '\t')
 			break;
 	if (i < len - 1)
-		return str.erase(i + 1);
-	return str;
+		str.erase(i + 1);
+
 }
 
-std::string trim(std::string str)
+void trim(std::string &str)
 {
-	return ltrim(rtrim(str));
+	ltrim(str);
+	rtrim(str);
 }
 
-std::string lcase(std::string str)
+void lcase(std::string &str)
 {
 	int len = str.length();
 	for (int i = 0; i < len; i++)
 		str[i] = tolower(str[i]);
-	return str;
 }
 
-std::string ucase(std::string str)
+void ucase(std::string &str)
 {
 	int len = str.length();
 	for (int i = 0; i < len; i++)
 		str[i] = toupper(str[i]);
-	return str;
 }
 
 int numLevel[] = { 
@@ -65,7 +64,7 @@ bool canBeNum(std::string str)
 	int len = str.length(), level = -1;
 	if (len == 0)
 		return false;
-	str = lcase(str);
+	lcase(str);
 	if (str[0] == '0' && len > 1)
 	{
 		if (len > 2 && str[1] == 'x')
@@ -171,7 +170,7 @@ std::string toHEX(unsigned int n)
 	ss >> ret;
 	if (ret.length() < 4)
 		ret = std::string(4 - ret.length(), '0') + ret;
-	ret = ucase(ret);
+	ucase(ret);
 	return ret;
 }
 

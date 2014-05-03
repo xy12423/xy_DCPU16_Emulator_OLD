@@ -159,7 +159,8 @@ void regist(string arg = "")
 		int ret = retGRegNum(arg, regt);
 		if (ret == _ERR_ASM_NOERR)
 		{
-			cout << ucase(arg) << "=";
+			ucase(arg);
+			cout << arg << "=";
 			printf("%04X", reg[regt]);
 			cout << endl << ':';
 			scanf("%x", &reg[regt]);
@@ -168,28 +169,28 @@ void regist(string arg = "")
 		{
 			if (arg == "pc")
 			{
-				cout << ucase(arg) << "=";
+				cout << "PC" << "=";
 				printf("%04X", pc);
 				cout << endl << ':';
 				scanf("%x", &pc);
 			}
 			else if (arg == "sp")
 			{
-				cout << ucase(arg) << "=";
+				cout << "SP" << "=";
 				printf("%04X", sp);
 				cout << endl << ':';
 				scanf("%x", &sp);
 			}
 			else if (arg == "ex")
 			{
-				cout << ucase(arg) << "=";
+				cout << "EX" << "=";
 				printf("%04X", ex);
 				cout << endl << ':';
 				scanf("%x", &ex);
 			}
 			else if (arg == "ia")
 			{
-				cout << ucase(arg) << "=";
+				cout << "IA" << "=";
 				printf("%04X", ia);
 				cout << endl << ':';
 				scanf("%x", &ia);
@@ -305,11 +306,20 @@ void generate(string path, string arg = "")
 		lineCount++;
 		file.getline(line, 65536, '\n');
 		insline = line;
-		insline = trim(insline);
+		trim(insline);
 		if (insline.length() < 1)
 			continue;
-		if (insline[0] == ';')
-			continue;
+		markPos = insline.find(';');
+		if (markPos != string::npos)
+		{
+			if (markPos == 0)
+				insline = "";
+			else
+			{
+				insline.erase(markPos - 1);
+				trim(insline);
+			}
+		}
 		markPos = insline.find('$');
 		if (markPos != string::npos)
 		{
@@ -493,7 +503,7 @@ int mainLoop()
 	{
 		cin.getline(_cmd, 100, '\n');
 		cmd = _cmd;
-		cmd = trim(cmd);
+		trim(cmd);
 		if (cmd.length() < 1)
 		{
 			cout << "  ^ Error" << endl << "-";
@@ -507,7 +517,8 @@ int mainLoop()
 			if (pos != string::npos)
 			{
 				argn++;
-				m_arg[0] = ltrim(cmd.substr(pos + 1));
+				m_arg[0] = cmd.substr(pos + 1);
+				ltrim(m_arg[0]);
 				cmd.erase(pos);
 				for (i = 1; i < INS_RET_LEN; i++)
 				{
@@ -516,7 +527,8 @@ int mainLoop()
 					if (pos == string::npos)
 						break;
 					argn++;
-					m_arg[i] = ltrim(m_arg[i - 1].substr(pos + 1));
+					m_arg[i] = m_arg[i - 1].substr(pos + 1);
+					ltrim(m_arg[i]);
 					m_arg[i - 1].erase(pos);
 				}
 			}
