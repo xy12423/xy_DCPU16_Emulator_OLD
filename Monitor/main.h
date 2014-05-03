@@ -505,6 +505,7 @@ volatile bool usrMF = false, usrMP = false;
 volatile int mOn = 0;
 volatile int blinkCount = 0;
 volatile bool blinkClock = false;
+volatile int monitorBootCount = 0;
 
 void CALLBACK ClockMain(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2)
 {
@@ -513,9 +514,9 @@ void CALLBACK ClockMain(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw
 		return;
 	else if (mOn == 1)
 	{
-		mOn = 2;
-		clock_t start = clock();
-		while (clock() - start < CLOCKS_PER_SEC);
+		monitorBootCount++;
+		if (monitorBootCount >= 50)
+			mOn = 2;
 		return;
 	}
 	blinkCount++;
