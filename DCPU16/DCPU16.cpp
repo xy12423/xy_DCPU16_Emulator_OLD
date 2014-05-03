@@ -279,7 +279,7 @@ void generate(string path, string arg = "")
 		return;
 	}
 
-	char line[100];
+	char *line = new char[65536];
 	int lineCount = 0;
 	string insline;
 	int markPos = string::npos;
@@ -303,7 +303,7 @@ void generate(string path, string arg = "")
 	while (!file.eof())
 	{
 		lineCount++;
-		file.getline(line, 100, '\n');
+		file.getline(line, 65536, '\n');
 		insline = line;
 		insline = trim(insline);
 		if (insline.length() < 1)
@@ -314,7 +314,7 @@ void generate(string path, string arg = "")
 		if (markPos != string::npos)
 		{
 			sysLabel = "__asm_sys_label_" + toHEX(sysLblCount);
-			insline = sysLabel + ":" + insline.substr(0, markPos) + sysLabel + insline.substr(markPos + sysLabel.length());
+			lblLst.push_back(label(sysLabel, add, add));
 		}
 		markPos = insline.find(':');
 		if (markPos != string::npos)
@@ -322,8 +322,16 @@ void generate(string path, string arg = "")
 			if (markPos == 0)
 			{
 				markPos = insline.find(' ');
-				lbl = insline.substr(1, markPos + 1);
-				insline.erase(0, markPos + 1);
+				if (markPos == string::npos)
+				{
+					lbl = insline.substr(1);
+					insline = "";
+				}
+				else
+				{
+					lbl = insline.substr(1, markPos - 1);
+					insline.erase(0, markPos + 1);
+				}
 				lblLst.push_back(label(lbl, add, add));
 			}
 			else
@@ -357,6 +365,7 @@ void generate(string path, string arg = "")
 					m[add] = m_ret[i];
 		}
 	}
+	delete[] line;
 	lblLst.sort();	//按标签长度从大到小排序以解决长标签与短标签内容部分重复时长标签被部分替换的问题
 	lblBeg = lblLst.begin();
 	lblEnd = lblLst.end();
@@ -412,7 +421,7 @@ void generate(string path, string arg = "")
 			case _ERR_ASM_ILLEGAL:
 			case _ERR_ASM_ILLEGAL_OP:
 			case _ERR_ASM_ILLEGAL_ARG:
-				cout << "Illegal instruction " << pendItm.str << endl;
+				cout << "Illegal instruction " << insline << endl;
 				goto _g_end;
 			default:
 				for (i = 0; i < len; i++, add++)
