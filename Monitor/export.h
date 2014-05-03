@@ -92,8 +92,13 @@ int __cdecl intrptKeyb()
 			keyList.clear();
 			break;
 		case 1:
-			(*setReg)(2, keyList.front());
-			keyList.pop_front();
+			if (keyList.empty())
+				(*setReg)(2, 0);
+			else
+			{
+				(*setReg)(2, keyList.front());
+				keyList.pop_front();
+			}
 			break;
 		case 2:
 			(*getReg)(1, &itr);
