@@ -233,16 +233,32 @@ void proceed()
 #endif
 }
 
-struct label
+struct pendItem
 {
 	std::string str;
 	USHORT pos;
-	list<label> used;
-	label(){};
-	label(std::string _str, USHORT _pos)
+	int len;
+	pendItem(){};
+	pendItem(std::string _str, USHORT _pos, int _len)
 	{
 		str = _str;
 		pos = _pos;
+		len = _len;
+	}
+};
+typedef list<pendItem> pendList;
+
+struct label
+{
+	std::string str;
+	USHORT pos, originPos;
+	pendList used;
+	label(){};
+	label(std::string _str, USHORT _pos, USHORT _originPos)
+	{
+		str = _str;
+		pos = _pos;
+		originPos = _originPos;
 	}
 	bool operator <(const label &n)
 	{
@@ -264,14 +280,17 @@ void generate(string path, string arg = "")
 	char line[100];
 	int lineCount = 0;
 	string insline;
-	stringList lblLst, pendLst;
+	stringList lblLst;
+	pendList pendLst;
 	string lbl;
 	int pendCount = 0;
 	int markPos = string::npos;
 	stringList::iterator lblBeg, lblItr, lblEnd;
-	label pendItem;
+	list<stringList::iterator> lblUsedLst;
+	list<stringList::iterator>::const_iterator usedItr, usedEnd;
+	pendItem pendItm;
 	USHORT add = toNum(arg);
-	int len = 0, i;
+	int len = 0, pendLen = 3, i;
 	memset(m, -1, sizeof(m));
 	while (!file.eof())
 	{
@@ -288,13 +307,13 @@ void generate(string path, string arg = "")
 			{
 				lbl = insline.substr(1);
 				insline = "";
-				lblLst.push_back(label(lbl, add));
+				lblLst.push_back(label(lbl, add, add));
 			}
 			else
 			{
 				lbl = insline.substr(0, markPos);
 				insline.erase(0, markPos + 1);
-				lblLst.push_back(label(lbl, add));
+				lblLst.push_back(label(lbl, add, add));
 			}
 		}
 		if (insline.length() < 1)
@@ -310,7 +329,8 @@ void generate(string path, string arg = "")
 				cout << "Illegal instruction in line " << lineCount << endl;
 				goto _g_end;
 			case _ERR_ASM_ILLEGAL_ARG:
-				pendLst.push_back(label(insline, add));
+				pendLst.push_back(pendItem(insline, add, 3));
+				//为含有未能识别的标签的代码留出空间
 				add += 3;
 				pendCount++;
 				break;
@@ -319,25 +339,27 @@ void generate(string path, string arg = "")
 					m[add] = m_ret[i];
 		}
 	}
-	lblLst.sort();
+	lblLst.sort();	//按标签长度从大到小排序以解决长标签与短标签内容部分重复时长标签被部分替换的问题
 	lblBeg = lblLst.begin();
 	lblEnd = lblLst.end();
 	int insLenAll = add;
+	//处理未被识别的标签
 	while (!pendLst.empty())
 	{
-		pendItem = pendLst.front();
+		pendItm = pendLst.front();
 		pendLst.pop_front();
-		insline = pendItem.str;
-		add = pendItem.pos;
-		m[add] = -1;
-		m[add + 1] = -1;
-		m[add + 2] = -1;
+		insline = pendItm.str;
+		add = pendItm.pos;
+		pendLen = pendItm.len;
+		for (i = 0; i < pendLen; i++)
+			m[add + i] = -1;
+		lblUsedLst.clear();
 		for (lblItr = lblBeg; lblItr != lblEnd; lblItr++)
 		{
 			markPos = insline.find(lblItr->str);
 			if (markPos != string::npos)
 			{
-				lblItr->used.push_back(pendItem);
+				lblUsedLst.push_back(lblItr);
 				while (markPos != string::npos)
 				{
 					insline = insline.substr(0, markPos) + "0x" + toHEX(lblItr->pos) + insline.substr(markPos + lblItr->str.length());
@@ -346,28 +368,48 @@ void generate(string path, string arg = "")
 			}
 		}
 		len = assembler(insline, m_ret, INS_RET_LEN);
+		pendItm.len = len;
+		usedEnd = lblUsedLst.cend();
+		for (usedItr = lblUsedLst.cbegin(); usedItr != usedEnd; usedItr++)
+		{
+			lblItr = *usedItr;
+			pendList *usedList = &(lblItr->used);
+			pendList::const_iterator itr, itrEnd = usedList->cend();
+			for (itr = usedList->cbegin(); itr != itrEnd; itr++)
+			{
+				if (itr->pos == add)
+				{
+					usedList->erase(itr);
+					break;
+				}
+			}
+			usedList->push_back(pendItm);
+		}
 		switch (len)
 		{
 			case _ERR_ASM_NOT_SUPPORTED:
-				cout << "Instruction " << pendItem.str << " is not supported" << endl;
+				cout << "Instruction " << pendItm.str << " is not supported" << endl;
 				goto _g_end;
 			case _ERR_ASM_ILLEGAL:
 			case _ERR_ASM_ILLEGAL_OP:
 			case _ERR_ASM_ILLEGAL_ARG:
-				cout << "Illegal instruction " << pendItem.str << endl;
+				cout << "Illegal instruction " << pendItm.str << endl;
 				goto _g_end;
 			default:
 				for (i = 0; i < len; i++, add++)
 					m[add] = m_ret[i];
-				if (len < 3)
+				//由于指令实际长度比预留空间短，在该指令后面的标签需要往前凑
+				if (len < pendLen)
 				{
+					pendLen = pendLen - len;
 					for (lblItr = lblBeg; lblItr != lblEnd; lblItr++)
 					{
-						if (lblItr->pos > add)
+						if (lblItr->originPos > add)
 						{
-							lblItr->pos -= (3 - len);
-							stringList *usedList = &(lblItr->used);
-							stringList::const_iterator itr, itrEnd = usedList->cend();
+							lblItr->pos -= pendLen;
+							//将含有被修改地址的标签的指令重新加入处理队列以用新值替换旧值
+							pendList *usedList = &(lblItr->used);
+							pendList::const_iterator itr, itrEnd = usedList->cend();
 							for (itr = usedList->cbegin(); itr != itrEnd; itr++)
 								pendLst.push_back(*itr);
 						}

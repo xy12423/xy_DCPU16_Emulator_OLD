@@ -388,7 +388,7 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 				ret1 = 0x1A;
 			else
 			{
-				if (retGRegNum(reg, ret1) == _ERR_ASM_ILLEGAL)
+				if (retGRegNum(reg, ret1) != _ERR_ASM_NOERR)
 				{
 					if (again)
 					{
@@ -397,7 +397,7 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 						goto _ran_begin;
 					}
 					else
-						return _ERR_ASM_ILLEGAL;
+						return _ERR_ASM_ILLEGAL_ARG;
 				}
 				ret1 += 0x10;
 			}
@@ -427,7 +427,7 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 				ret1 = 0x19;
 			else
 			{
-				if (retGRegNum(arg, ret1) == _ERR_ASM_ILLEGAL)
+				if (retGRegNum(arg, ret1) != _ERR_ASM_NOERR)
 					return _ERR_ASM_ILLEGAL_ARG;
 				ret1 += 0x08;
 			}
@@ -454,7 +454,7 @@ int retArgNum(std::string arg, USHORT &ret1, USHORT &ret2)
 			int arglen = arg.length();
 			if (arglen == 1)
 			{
-				if (retGRegNum(arg, ret1) == _ERR_ASM_ILLEGAL)
+				if (retGRegNum(arg, ret1) != _ERR_ASM_NOERR)
 					return _ERR_ASM_ILLEGAL_ARG;
 			}
 			else if (arglen == 2)
