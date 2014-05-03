@@ -268,6 +268,7 @@ struct label
 typedef list<label> stringList;
 
 int m[65536];
+bool joined[65536];
 
 void generate(string path, string arg = "")
 {
@@ -298,6 +299,7 @@ void generate(string path, string arg = "")
 	int len = 0, pendLen = 3, i;
 
 	memset(m, -1, sizeof(m));
+	memset(joined, false, sizeof(joined));
 	while (!file.eof())
 	{
 		lineCount++;
@@ -344,6 +346,7 @@ void generate(string path, string arg = "")
 				goto _g_end;
 			case _ERR_ASM_ILLEGAL_ARG:
 				pendLst.push_back(pendItem(insline, add, 3));
+				joined[add] = true;
 				//为含有未能识别的标签的代码留出空间
 				add += 3;
 				pendCount++;
@@ -364,6 +367,7 @@ void generate(string path, string arg = "")
 		pendLst.pop_front();
 		insline = pendItm.str;
 		add = pendItm.pos;
+		joined[add] = false;
 		pendLen = pendItm.len;
 		for (i = 0; i < pendLen; i++)
 			m[add + i] = -1;
@@ -425,7 +429,13 @@ void generate(string path, string arg = "")
 							pendList *usedList = &(lblItr->used);
 							pendList::const_iterator itr, itrEnd = usedList->cend();
 							for (itr = usedList->cbegin(); itr != itrEnd; itr++)
-								pendLst.push_back(*itr);
+							{
+								if (!joined[itr->pos])
+								{
+									pendLst.push_back(*itr);
+									joined[itr->pos] = true;
+								}
+							}
 						}
 					}
 				}
