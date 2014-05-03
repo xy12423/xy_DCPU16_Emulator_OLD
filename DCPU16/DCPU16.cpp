@@ -120,9 +120,10 @@ void dump(string arg)
 		{
 			printf("%04X ", mem[add]);
 			add++;
-			if (add > 0x10000)
+			if (add >= 0x10000)
 			{
 				add = 0;
+				cout << endl;
 				return;
 			}
 		}

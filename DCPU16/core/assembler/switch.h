@@ -260,6 +260,8 @@ int retOpStr2(USHORT op, std::string &ret)
 		ret = op2[op];
 	else
 		return _ERR_ASM_ILLEGAL;
+	if (ret == "")
+		return _ERR_ASM_ILLEGAL;
 	return _ERR_ASM_NOERR;
 }
 
@@ -305,6 +307,8 @@ int retOpStr3(USHORT op, std::string &ret)
 	else if (op < 0x20)
 		ret = op3[op];
 	else
+		return _ERR_ASM_ILLEGAL;
+	if (ret == "")
 		return _ERR_ASM_ILLEGAL;
 	return _ERR_ASM_NOERR;
 }
